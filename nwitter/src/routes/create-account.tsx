@@ -4,7 +4,7 @@ import {auth} from "../firebase";
 import {Link , useNavigate} from "react-router-dom";
 import {FirebaseError} from "firebase/app";
 import {Form , Input , Wrapper , Title , Error , Switcher} from "../components/auth-components";
-
+import GithubBtn from "../components/github-btn";
 export default function CreateAccount(){
     const navigate = useNavigate();
     const [isLoading , setLoading] = useState(false);
@@ -84,5 +84,6 @@ export default function CreateAccount(){
             <Switcher>
                 Already have an account? <Link to="/login">Log in &rarr;</Link>
             </Switcher>
+            <GithubBtn />
     </Wrapper>
 }

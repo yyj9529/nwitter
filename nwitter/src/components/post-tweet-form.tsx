@@ -1,8 +1,10 @@
 import {useState} from "react";
 import {styled} from "styled-components";
 import {auth} from "../firebase";
-import {addDoc , collection} from "firebase/firestore";
+import {addDoc , collection ,updateDoc} from "firebase/firestore";
 import {db} from "../firebase";
+import {ref ,uploadBytes ,getDownloadURL} from "firebase/storage";
+import {storage} from "../firebase";
 
 const Form = styled.form`
     display : flex;
@@ -81,12 +83,23 @@ export default function PostTweetForm(){
         }
         try{
             setLoading(true);
-            await addDoc(collection(db,"tweets"),{
+            const doc = await addDoc(collection(db,"tweets"),{
                 tweet,
                 createdAt : Date.now(),
                 username : user.email,
                 userId : user.uid,
             });
+            if(file){
+              //  const locationRef = ref(storage,`tweets/${user.uid}/${user.displayName}/${doc.id}`);
+                const locationRef = ref(storage,`tweets/${user.uid}/${doc.id}`);
+                const result = await uploadBytes(locationRef,file);
+                const url = await getDownloadURL(result.ref);
+                await updateDoc(doc,{
+                    photo : url
+                });
+            }
+            setTweet("");
+            setFile(null);
         }catch(error){
             console.log(error);
         }finally{
@@ -98,6 +111,7 @@ export default function PostTweetForm(){
     return(
         <Form onSubmit={onSubmit}>
             <TextArea
+                required
                 rows={5}
                 maxLength={180}
                 onChange={onChange}
